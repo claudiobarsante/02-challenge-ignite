@@ -67,9 +67,15 @@ export function CartProvider({ children }: CartProviderProps): JSX.Element {
 
 	const removeProduct = (productId: number) => {
 		try {
-			// TODO
+			const product = cart.find(p => p.id === productId);
+
+			if (product && product.amount > 1) {
+				const updated = cart.map(product =>
+					product.id === productId ? { ...product, amount: product.amount - 1 } : product
+				);
+			}
 		} catch {
-			// TODO
+			toast.error('Erro na remoção do produto');
 		}
 	};
 
