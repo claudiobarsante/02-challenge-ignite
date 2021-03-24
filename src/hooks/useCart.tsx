@@ -62,15 +62,16 @@ export function CartProvider({ children }: CartProviderProps): JSX.Element {
 			//o '!' is to tell the compiler that it is definetly defined
 			const isProductInStock = product!.amount < amount;
 
-			if (!isProductInStock) {
-				toast.error('Quantidade solicitada fora de estoque');
+			if (isProductInStock) {
+				const updated = cart.map(product =>
+					product.id === productId ? { ...product, amount: product.amount + 1 } : product
+				);
+
+				updateCartAndLocalStorage(updated);
 				return;
 			}
 
-			const updated = cart.map(product =>
-				product.id === productId ? { ...product, amount: product.amount + 1 } : product
-			);
-			updateCartAndLocalStorage(updated);
+			toast.error('Quantidade solicitada fora de estoque');
 		} catch (error) {
 			toast.error('Erro na adição do produto');
 		}
@@ -80,11 +81,14 @@ export function CartProvider({ children }: CartProviderProps): JSX.Element {
 		try {
 			const product = cart.find(p => p.id === productId);
 
-			if (!product) return;
+			if (product) {
+				const updated = cart.filter(product => product.id !== productId);
 
-			const updated = cart.filter(product => product.id !== productId);
+				updateCartAndLocalStorage(updated);
+				return;
+			}
 
-			updateCartAndLocalStorage(updated);
+			toast.error('Erro na remoção do produto');
 		} catch {
 			toast.error('Erro na remoção do produto');
 		}
@@ -96,11 +100,25 @@ export function CartProvider({ children }: CartProviderProps): JSX.Element {
 
 			const product = cart.find(p => p.id === productId);
 
-			if (!product) return;
+			if (!product) {
+				toast.error('Erro na alteração de quantidade do produto');
+				return;
+			}
 
-			//const {
-			//	data: { amount },
-			//} = await api.get(`/stock/${productId}`);
+			const response = await api.get(`/stock/${productId}`);
+
+			const isProductInStock = amount <= response.data.amount;
+
+			if (isProductInStock) {
+				const updated = cart.map(product =>
+					product.id === productId ? { ...product, amount: product.amount + 1 } : product
+				);
+
+				updateCartAndLocalStorage(updated);
+				return;
+			}
+
+			toast.error('Quantidade solicitada fora de estoque');
 		} catch {
 			toast.error('Erro na alteração de quantidade do produto');
 		}
