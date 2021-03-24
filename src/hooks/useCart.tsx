@@ -68,10 +68,9 @@ export function CartProvider({ children }: CartProviderProps): JSX.Element {
 				);
 
 				updateCartAndLocalStorage(updated);
-				return;
+			} else {
+				toast.error('Quantidade solicitada fora de estoque');
 			}
-
-			toast.error('Quantidade solicitada fora de estoque');
 		} catch (error) {
 			toast.error('Erro na adição do produto');
 		}

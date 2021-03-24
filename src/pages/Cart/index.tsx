@@ -29,12 +29,10 @@ const Cart = (): JSX.Element => {
 	);
 
 	function handleProductIncrement(product: Product) {
-		console.log('aumentando ', product.amount + 1);
 		updateProductAmount({ productId: product.id, amount: product.amount + 1 });
 	}
 
 	function handleProductDecrement(product: Product) {
-		console.log('diminuindo ', product.amount - 1);
 		updateProductAmount({ productId: product.id, amount: product.amount - 1 });
 	}
 
